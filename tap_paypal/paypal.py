@@ -66,8 +66,6 @@ class PayPal(object):
 
         self._create_headers()
         pprint(response.json())
-    
-
 
     def paypal_transactions(self, **kwargs: dict) -> list:
         # Create string of parameters
