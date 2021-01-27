@@ -4,14 +4,14 @@
 import httpx
 from pprint import pprint
 from types import MappingProxyType
-
+import urllib
 
 API_SCHEME: str = 'https://'
 API_BASE_URL: str = 'api-m.sandbox.paypal.com'
 API_VERSION: str = 'v1'
 
 API_PATH_OAUTH: str = 'oauth2/token'
-API_PATH_TRANSACTIONS: str = ''
+API_PATH_TRANSACTIONS: str = 'reporting/transactions'
 
 HEADERS: MappingProxyType = MappingProxyType({  # Frozen dictionary
     'Content-Type': 'application/json',
@@ -39,12 +39,12 @@ class PayPal(object):
     def _authenticate(self) -> None:
         """Generate a bearer access token."""
         url: str = (
-            f'{API_SCHEME}{self.client_id}:{self.secret}@{API_BASE_URL}/'
+            f'{API_SCHEME}{API_BASE_URL}/'
             f'{API_VERSION}/{API_PATH_OAUTH}'
         )
         headers: dict = {
             'Accept': 'application/json',
-            'Accept-Language': 'en_US'
+            'Accept-Language': 'en_US',
         }
         post_data: dict = {'grant_type': 'client_credentials'}
 
@@ -53,6 +53,7 @@ class PayPal(object):
             url,
             headers=headers,
             data=post_data,
+            auth=(self.client_id, self.secret)
         )
 
         # Raise error on 4xx and 5xxx
@@ -63,8 +64,34 @@ class PayPal(object):
         self.token = response_data.get('access_token')
         self.token_expires_in = response_data.get('expires_in')
 
-
+        self._create_headers()
         pprint(response.json())
+    
 
 
-p = PayPal('test', 'test')
+    def paypal_transactions(self, **kwargs: dict) -> list:
+        # Create string of parameters
+        params: str = urllib.parse.urlencode(kwargs)
+        url: str = (
+            f'{API_SCHEME}{API_BASE_URL}/'
+            f'{API_VERSION}/{API_PATH_TRANSACTIONS}{params}'
+        )
+        response: httpx._models.Response = httpx.get(  # noqa: WPS437
+            url,
+            headers=self.headers,
+        )
+
+        response.raise_for_status()
+
+        response_data: dict = response.json()
+
+        pprint(response_data)
+
+        
+    def _create_headers(self):
+        headers: dict = dict(HEADERS)
+        headers['Authorization'] = headers['Authorization'].replace(
+            ':accesstoken:',
+            self.token,
+        )
+        self.headers = headers
