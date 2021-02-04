@@ -26,7 +26,11 @@ def sync(
         start_date {str} -- Start date
     """
     # For every stream in the catalog
+    LOGGER.info('TESTT')
     for stream in catalog.get_selected_streams(state):
+        LOGGER.info(stream)
+        print(stream)
+
         LOGGER.info(f'Syncing stream: {stream.tap_stream_id}')
 
         bookmark_column = stream.replication_key
@@ -38,8 +42,10 @@ def sync(
             key_properties=stream.key_properties,
         )
 
+        
         # TODO: delete and replace this inline function with your own data retrieval process:
-        tap_data = lambda: [{"id": x, "name": "row${x}"} for x in range(1000)]
+        #tap_data = lambda: [{"id": x, "name": "row${x}"} for x in range(1000)]
+        tap_data = getattr(paypal, stream.tap_stream_id)
 
         max_bookmark = None
 
