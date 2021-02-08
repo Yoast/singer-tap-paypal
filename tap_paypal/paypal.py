@@ -10,7 +10,7 @@ import singer
 
 
 API_SCHEME: str = 'https://'
-API_BASE_URL: str = 'api-m.sandbox.paypal.com'
+API_BASE_URL: str = 'api-m.paypal.com'
 API_VERSION: str = 'v1'
 
 API_PATH_OAUTH: str = 'oauth2/token'
