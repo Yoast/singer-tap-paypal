@@ -26,11 +26,22 @@ def sync(
         start_date {str} -- Start date
     """
     # For every stream in the catalog
-    LOGGER.info('TESTT')
-    for stream in catalog.get_selected_streams(state):
-        LOGGER.info(stream)
-        print(stream)
+    LOGGER.info('Sync')
+    LOGGER.info('Current state:')
+    LOGGER.info(state)
 
+    # Set currently syncing
+    for stream_name, stream_state in state.get('bookmarks', {}).items():
+        LOGGER.info(f'Stream name: {stream_name} --> state: {stream_state}')
+        singer.set_currently_syncing(state, stream_name)
+
+    LOGGER.info('Write state') 
+    singer.write_state(state)
+
+    LOGGER.info('Selected streams are now:') 
+    LOGGER.info(list(catalog.get_selected_streams(state)))
+
+    for stream in catalog.get_selected_streams(state):
         LOGGER.info(f'Syncing stream: {stream.tap_stream_id}')
 
         bookmark_column = stream.replication_key
