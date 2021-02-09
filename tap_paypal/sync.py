@@ -65,7 +65,8 @@ def sync(
         max_bookmark = None
 
         # For every row in the tap data
-        for row in tap_data():
+        # Manual parameters as test
+        for row in tap_data(start_date='2020-01-01T00:00:00+0000', end_date='2020-01-02T00:00:00+0000'):
             # TODO: place type conversions or transformations here
 
             # write one or more rows to the stream:
