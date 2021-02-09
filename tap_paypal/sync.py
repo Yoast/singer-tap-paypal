@@ -46,6 +46,10 @@ def sync(
     for stream in catalog.streams:
         LOGGER.info(f'Syncing stream: {stream.tap_stream_id}')
 
+        # Get the state
+        stream_state = state.get('bookmarks', {}).get(stream.tap_stream_id)
+        LOGGER.info(stream_state)
+
         bookmark_column = stream.replication_key
         is_sorted: bool = True  # TODO: indicate whether data is sorted ascending on bookmark value
 
@@ -66,7 +70,9 @@ def sync(
 
         # For every row in the tap data
         # Manual parameters as test
-        for row in tap_data(start_date='2020-01-01T00:00:00+0000', end_date='2020-01-02T00:00:00+0000'):
+        for row in tap_data(
+            start_date='2021-01-01T00:00:00+0000'
+        ): 
             # TODO: place type conversions or transformations here
 
             # write one or more rows to the stream:
