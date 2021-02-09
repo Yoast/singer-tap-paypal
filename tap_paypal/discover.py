@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from singer.catalog import Catalog, CatalogEntry
 from tap_paypal.schema import load_schemas
+from singer import metadata
 
 
 def discover() -> Catalog:  # noqa: WPS210
@@ -15,6 +16,14 @@ def discover() -> Catalog:  # noqa: WPS210
 
     # For every schema
     for stream_id, schema in raw_schemas.items():
+
+        # mdata = metadata.new()
+        # mdata = metadata.get_standard_metadata(
+        #     schema=schema,
+        #     key_properties=None,
+        #     valid_replication_keys=None,
+        #     replication_method=None,
+        # )
 
         # TODO: populate any metadata and stream's key properties here..
         stream_metadata: list = []

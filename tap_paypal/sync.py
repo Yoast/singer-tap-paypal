@@ -36,20 +36,24 @@ def sync(
         singer.set_currently_syncing(state, stream_name)
 
     LOGGER.info('Write state') 
-    singer.write_state(state)
+    singer.write_state({"test": 123})
 
     LOGGER.info('Selected streams are now:') 
     LOGGER.info(list(catalog.get_selected_streams(state)))
 
-    for stream in catalog.get_selected_streams(state):
+
+    #for stream in catalog.get_selected_streams(state):
+    for stream in catalog.streams:
         LOGGER.info(f'Syncing stream: {stream.tap_stream_id}')
 
         bookmark_column = stream.replication_key
         is_sorted: bool = True  # TODO: indicate whether data is sorted ascending on bookmark value
 
+        LOGGER.info(stream.key_properties)
+
         singer.write_schema(
             stream_name=stream.tap_stream_id,
-            schema=stream.schema,
+            schema=stream.schema.to_dict(),
             key_properties=stream.key_properties,
         )
 
