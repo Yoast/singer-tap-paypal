@@ -1,15 +1,14 @@
 """PayPal API Client."""
 # -*- coding: utf-8 -*-
 
-from typing import Optional
 from datetime import datetime, timedelta, timezone
-import httpx
-from pprint import pprint
 from types import MappingProxyType
-import singer
+from typing import Generator, Optional
+
 import dateutil.parser
 import dateutil.rrule
-
+import httpx
+import singer
 
 API_SCHEME: str = 'https://'
 API_BASE_URL: str = 'api-m.paypal.com'
@@ -40,6 +39,8 @@ class PayPal(object):
 
         self.token: Optional[str] = None
         self.token_expires: Optional[datetime] = None
+
+        # Perform authentication during initialising
         self._authenticate()
 
     def _authenticate(self) -> None:
@@ -67,34 +68,55 @@ class PayPal(object):
 
         response_data: dict = response.json()
 
+        # Save the token
         self.token = response_data.get('access_token')
 
-        # Set experation date for tokenn
+        # Set experation date for token
         expires_in: int = response_data.get('expires_in', 0)
         self.token_expires = now + timedelta(expires_in)
 
+        # Set up headers to use in API requests
         self._create_headers()
 
         self.logger.info(
             f"Authentication succesfull (appid: {response_data.get('app_id')})"
         )
 
-    def paypal_transactions(self, **kwargs: dict) -> list:
-        if 'start_date' not in kwargs:
-            raise ValueError('start_date required')
+    def paypal_transactions(
+        self,
+        **kwargs: dict,
+    ) -> Generator[dict, None, None]:
+        """PayPal transaction history.
 
-        # Set input date and output date
-        start_date: datetime = dateutil.parser.isoparse(kwargs['start_date'])
+        Raises:
+            ValueError: When the parameter start_date is missing
+
+        Yields:
+            Generator[dict] -- Yields PayPal transactions
+        """
+        self.logger.info('Stream PayPal transactions')
+
+        # Validate the start_date value exists
+        start_date_input: str = str(kwargs.get('start_date', ''))
+
+        if not start_date_input:
+            raise ValueError('The parameter start_date is required.')
+
+        # Set start date and end date
+        start_date: datetime = dateutil.parser.isoparse(start_date_input)
         end_date: datetime = datetime.now(timezone.utc).replace(microsecond=0)
 
+        self.logger.info(
+            f'Retrieving transactions from {start_date} to {end_date}'
+        )
         # Extra kwargs will be converted to parameters in the API requests
         # start_date is parsed into batches, thus we remove it from the kwargs
         kwargs.pop('start_date', None)
 
         # The difference between start_date and end_date can max be 31 days
-        # Split up the requests in weekly batches
-        batches = dateutil.rrule.rrule(
-            dateutil.rrule.WEEKLY, 
+        # Split up the requests into weekly batches
+        batches: dateutil.rrule.rrule = dateutil.rrule.rrule(
+            dateutil.rrule.WEEKLY,
             dtstart=start_date,
             until=end_date,
         )
@@ -104,15 +126,19 @@ class PayPal(object):
 
         current_batch: int = 0
 
-        # Batches contains all start_dates, the end_date is 6 days 23:59 later
+        # Batches contain all start_dates, the end_date is 6 days 23:59 later
+        # E.g. 2021-01-01T00:00:00+0000 <--> 2021-01-07T23:59:59+0000
         for start_date_batch in batches:
-            end_date_batch = start_date_batch + timedelta(days=7, seconds=-1)
+            # Determine the end_date
+            end_date_batch: datetime = (
+                start_date_batch + timedelta(days=7, seconds=-1)
+            )
 
             # Prevent the end_date from going into the future
             if end_date_batch > end_date:
                 end_date_batch = end_date
 
-            # Convert the datetimes to date formats the api expects
+            # Convert the datetimes to datetime formats the api expects
             start_date_str: str = self._date_to_paypal_format(start_date_batch)
             end_date_str: str = self._date_to_paypal_format(end_date_batch)
 
@@ -121,13 +147,12 @@ class PayPal(object):
             self.logger.info(
                 f'Parsing batch {current_batch}: {start_date_str} <--> '
                 f'{end_date_str}')
- 
 
-            # Default parameters send with each request
+            # Default initial parameters send with each request
             fixed_params: dict = {
                 'fields': 'all',
                 'page_size': 100,
-                'page': 1,
+                'page': 1,  # Is updated in further requests
                 'start_date': start_date_str,
                 'end_date': end_date_str,
             }
@@ -142,20 +167,22 @@ class PayPal(object):
                 f'{API_VERSION}/{API_PATH_TRANSACTIONS}'
             )
 
-            # Request more pages when there are available
+            # Request more pages if there are available
             while page < total_pages:
                 # Update current page
                 page += 1
                 params['page'] = page
 
+                # Request data from the API
                 response: httpx._models.Response = httpx.get(  # noqa: WPS437
                     url,
                     headers=self.headers,
                     params=params,
                 )
+                # Raise error on 4xx and 5xxx
                 response.raise_for_status()
-                response_data: dict = response.json()
 
+                response_data: dict = response.json()
 
                 # Retrieve the current page details
                 page = response_data.get('page', 1)
@@ -173,9 +200,12 @@ class PayPal(object):
                 )
 
                 # Yield every transaction in the response
-                transactions: list = response_data.get('transactions_details', [])
+                transactions: list = response_data.get(
+                    'transaction_details',
+                    [],
+                )
                 for transaction in transactions:
-                    yield transactions
+                    yield transaction
 
         self.logger.info('Finished: paypal_transactions')
 

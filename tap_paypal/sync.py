@@ -1,8 +1,9 @@
 """Sync data."""
 # -*- coding: utf-8 -*-
 
+from typing import Callable
 import logging
-
+from pprint import pprint
 import singer
 from singer.catalog import Catalog
 
@@ -35,10 +36,10 @@ def sync(
         LOGGER.info(f'Stream name: {stream_name} --> state: {stream_state}')
         singer.set_currently_syncing(state, stream_name)
 
-    LOGGER.info('Write state') 
+    LOGGER.info('Write state')
     singer.write_state({"test": 123})
 
-    LOGGER.info('Selected streams are now:') 
+    LOGGER.info('Selected streams are now:')
     LOGGER.info(list(catalog.get_selected_streams(state)))
 
 
@@ -47,10 +48,15 @@ def sync(
         LOGGER.info(f'Syncing stream: {stream.tap_stream_id}')
 
         # Get the state
-        stream_state = state.get('bookmarks', {}).get(stream.tap_stream_id)
+        stream_state: dict = state.get(
+            'bookmarks',
+            {},
+        ).get(stream.tap_stream_id)
+
         LOGGER.info(stream_state)
 
         bookmark_column = stream.replication_key
+        LOGGER.info(f'Bookbmark column: {bookmark_column}')
         is_sorted: bool = True  # TODO: indicate whether data is sorted ascending on bookmark value
 
         LOGGER.info(stream.key_properties)
@@ -61,19 +67,23 @@ def sync(
             key_properties=stream.key_properties,
         )
 
-        
         # TODO: delete and replace this inline function with your own data retrieval process:
-        #tap_data = lambda: [{"id": x, "name": "row${x}"} for x in range(1000)]
-        tap_data = getattr(paypal, stream.tap_stream_id)
+        # tap_data = lambda: [{"id": x, "name": "row${x}"} for x in range(1000)]
+
+        # Every stream has a corresponding method in the PayPal object e.g.:
+        # The stream paypal_transactions will call paypal.paypal_transactions
+        tap_data: Callable = getattr(paypal, stream.tap_stream_id)
 
         max_bookmark = None
 
-        # For every row in the tap data
-        # Manual parameters as test
-        for row in tap_data(
-            start_date='2021-01-01T00:00:00+0000'
-        ): 
+        # The tap_data method yields rows of data from the API
+        # The state of the stream is used as kwargs for the method
+        # # E.g. start_date='2021-01-01T00:00:00+0000'
+        for row in tap_data(**stream_state):
             # TODO: place type conversions or transformations here
+            pprint(row)
+            
+
 
             # write one or more rows to the stream:
             singer.write_records(stream.tap_stream_id, [row])
@@ -86,5 +96,7 @@ def sync(
                 else:
                     # if data unsorted, save max value until end of writes
                     max_bookmark = max(max_bookmark, row[bookmark_column])
+
+            break
         if bookmark_column and not is_sorted:
             singer.write_state({stream.tap_stream_id: max_bookmark})
