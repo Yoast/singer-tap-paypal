@@ -6,10 +6,10 @@ from argparse import Namespace
 import singer
 from singer import utils
 from singer.catalog import Catalog
-from tap_paypal.discover import discover
-from tap_paypal.sync import sync
-from tap_paypal.paypal import PayPal
 
+from tap_paypal.discover import discover
+from tap_paypal.paypal import PayPal
+from tap_paypal.sync import sync
 
 LOGGER: logging.RootLogger = singer.get_logger()
 REQUIRED_CONFIG_KEYS: tuple = ('start_date', 'client_id', 'secret')
