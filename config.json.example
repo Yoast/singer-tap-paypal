@@ -1,0 +1,5 @@
+{
+  "client_id": "paypal_client_id",
+  "secret": "paypal_secret",
+  "start_date": "2021-01-01T00:00:00Z"
+}
