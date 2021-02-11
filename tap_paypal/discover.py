@@ -16,10 +16,11 @@ def discover() -> Catalog:  # noqa: WPS210
     raw_schemas: dict = load_schemas()
     streams: list = []
 
-    # For every schema
+    # Parse every schema
     for stream_id, schema in raw_schemas.items():
 
-        mdata = metadata.get_standard_metadata(
+        # Create metadata
+        mdata: list = metadata.get_standard_metadata(
             schema=schema.to_dict(),
             key_properties=STREAMS[stream_id].get('key_properties', None),
             valid_replication_keys=STREAMS[stream_id].get(
@@ -32,6 +33,7 @@ def discover() -> Catalog:  # noqa: WPS210
             ),
         )
 
+        # Create a catalog entry
         streams.append(
             CatalogEntry(
                 tap_stream_id=stream_id,
