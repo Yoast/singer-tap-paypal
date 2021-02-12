@@ -420,6 +420,27 @@
             }
           }
         },
+        "phone_number": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "country_code": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "national_number": {
+              "type": [
+                "null",
+                "string"
+              ]
+            }
+          }
+        },
         "country_code": {
           "type": [
             "null",
@@ -508,6 +529,34 @@
             ],
             "additionalProperties": false,
             "properties": {
+              "checkout_options": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "additionalProperties": false,
+                "items": {
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "checkout_option_name": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "checkout_option_value": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              },
               "item_code": {
                 "type": [
                   "null",
@@ -521,6 +570,12 @@
                 ]
               },
               "item_description": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "item_options": {
                 "type": [
                   "null",
                   "string"
@@ -669,7 +724,64 @@
         "null",
         "object"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "properties": {
+        "incentive_details": {
+          "type": [
+            "null",
+            "array"
+          ],
+          "additionalProperties": false,
+          "items": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "incentive_amount": {
+                "type": [
+                  "null",
+                  "object"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "currency_code": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "value": {
+                    "type": [
+                      "null",
+                      "number"
+                    ]
+                  }
+                }
+              },
+              "incentive_code": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "incentive_program_code": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "incentive_type": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              }
+            }
+          }
+        }
+      }
     },
     "account_number": {
       "type": [

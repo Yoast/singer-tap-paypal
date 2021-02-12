@@ -238,9 +238,6 @@ class PayPal(object):
         Returns:
             dict -- Cleaned row
         """
-        import json
-        with open('output.txt', 'wt') as out:
-            json.dump(row, out, ensure_ascii=False, indent=4)
         # transaction_info.available_balance.value
         if row.get('transaction_info', {}).get('available_balance', {}).get(
             'value',
@@ -352,4 +349,14 @@ class PayPal(object):
             # cart_info.item_details[tax_percentage]
             if details.get('tax_percentage'):
                 details['tax_percentage'] = float(details['tax_percentage'])
+
+        for incentive in row.get('incentive_info', {}).get(
+            'incentive_details',
+            [],
+        ):
+            # incentive_details.incentive_amount.value
+            if incentive.get('incentive_amount', {}).get('value'):
+                incentive['incentive_amount']['value'] = float(
+                    incentive['incentive_amount']['value']
+                )
         return row
