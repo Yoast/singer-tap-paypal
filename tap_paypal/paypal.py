@@ -205,7 +205,7 @@ class PayPal(object):
                     [],
                 )
                 for transaction in transactions:
-                    yield transaction
+                    yield self._paypal_transactions_parse(transaction)
 
         self.logger.info('Finished: paypal_transactions')
 
@@ -228,3 +228,128 @@ class PayPal(object):
             str -- Converted datetime: 2021-01-01T00:00:00+0000
         """
         return ''.join(input_datetime.isoformat().rsplit(':', 1))
+
+    def _paypal_transactions_parse(self, row: dict) -> dict:
+        """Parse a row of transaction data and clean it.
+
+        Arguments:
+            row {dict} -- Input row
+
+        Returns:
+            dict -- Cleaned row
+        """
+        import json
+        with open('output.txt', 'wt') as out:
+            json.dump(row, out, ensure_ascii=False, indent=4)
+        # transaction_info.available_balance.value
+        if row.get('transaction_info', {}).get('available_balance', {}).get(
+            'value',
+        ):
+            row['transaction_info']['available_balance']['value'] = (
+                float(row['transaction_info']['available_balance']['value'])
+            )
+        # transaction_info.ending_balance.value
+        if row.get('transaction_info', {}).get('ending_balance', {}).get(
+            'value',
+        ):
+            row['transaction_info']['ending_balance']['value'] = (
+                float(row['transaction_info']['ending_balance']['value'])
+            )
+        # transaction_info.transaction_amount.value
+        if row.get('transaction_info', {}).get('transaction_amount', {}).get(
+            'value',
+        ):
+            row['transaction_info']['transaction_amount']['value'] = (
+                float(row['transaction_info']['transaction_amount']['value'])
+            )
+        # transaction_info.fee_amount.value
+        if row.get('transaction_info', {}).get('fee_amount', {}).get(
+            'value',
+        ):
+            row['transaction_info']['fee_amount']['value'] = (
+                float(row['transaction_info']['fee_amount']['value'])
+            )
+        # transaction_info.insurance_amount.value
+        if row.get('transaction_info', {}).get('insurance_amount', {}).get(
+            'value',
+        ):
+            row['transaction_info']['insurance_amount']['value'] = (
+                float(row['transaction_info']['insurance_amount']['value'])
+            )
+        # transaction_info.shipping_amount.value
+        if row.get('transaction_info', {}).get('shipping_amount', {}).get(
+            'value',
+        ):
+            row['transaction_info']['shipping_amount']['value'] = (
+                float(row['transaction_info']['shipping_amount']['value'])
+            )
+        # transaction_info.sales_tax_amount.value
+        if row.get('transaction_info', {}).get('sales_tax_amount', {}).get(
+            'value',
+        ):
+            row['transaction_info']['sales_tax_amount']['value'] = (
+                float(row['transaction_info']['sales_tax_amount']['value'])
+            )
+        # transaction_info.shipping_discount_amount.value
+        if row.get('transaction_info', {}).get(
+            'shipping_discount_amount', {}).get(
+            'value',
+        ):
+            row['transaction_info']['shipping_discount_amount']['value'] = (
+                float(
+                    row['transaction_info']['shipping_discount_amount']['value']
+                )
+            )
+
+        # cart_info.item_unit_price.value
+        if row.get('cart_info', {}).get('item_unit_price', {}).get(
+            'value',
+        ):
+            row['cart_info']['item_unit_price']['value'] = (
+                float(row['cart_info']['item_unit_price']['value'])
+            )
+
+        # tax_cart_info.amounts.item_unit_price.value
+        if row.get('cart_info', {}).get('tax_amounts', {}).get(
+            'value',
+        ):
+            row['cart_info']['tax_amounts']['value'] = (
+                float(row['cart_info']['tax_amounts']['value'])
+            )
+        # cart_info.item_unit_price.value
+        if row.get('cart_info', {}).get('total_item_amount', {}).get(
+            'value',
+        ):
+            row['cart_info']['total_item_amount']['value'] = (
+                float(row['cart_info']['total_item_amount']['value'])
+            )
+
+        for details in row.get('cart_info', {}).get('item_details', []):
+            # cart_info.item_details[item_quantity]
+            if details.get('item_quantity'):
+                details['item_quantity'] = float(details['item_quantity'])
+            # cart_info.item_details[item_unit_price.value]
+            if details.get('item_unit_price', {}).get('value'):
+                details['item_unit_price']['value'] = float(
+                    details['item_unit_price']['value']
+                )
+            # cart_info.item_details[item_amount.value]
+            if details.get('item_amount', {}).get('value'):
+                details['item_amount']['value'] = float(
+                    details['item_amount']['value']
+                )
+            # cart_info.item_details[total_item_amount.value]
+            if details.get('total_item_amount', {}).get('value'):
+                details['total_item_amount']['value'] = float(
+                    details['total_item_amount']['value']
+                )
+            # cart_info.item_details[tax_amounts[tax_amount.value]]
+            for tax in details.get('tax_amounts', []):
+                if tax.get('tax_amount', {}).get('value'):
+                    tax['tax_amount']['value'] = float(
+                        tax['tax_amount']['value']
+                    )
+            # cart_info.item_details[tax_percentage]
+            if details.get('tax_percentage'):
+                details['tax_percentage'] = float(details['tax_percentage'])
+        return row

@@ -13,11 +13,116 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "available_balance": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "currency_code": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "value": {
+              "type": [
+                "null",
+                "number"
+              ]
+            }
+          }
+        },
+        "bank_reference_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "custom_field": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "ending_balance": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "currency_code": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "value": {
+              "type": [
+                "null",
+                "number"
+              ]
+            }
+          }
+        },
+        "invoice_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },     
         "paypal_account_id": {
           "type": [
             "null",
             "string"
           ]
+        },
+        "payment_tracking_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "paypal_reference_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "paypal_reference_id_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "protection_eligibility": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "sales_tax_amount": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "currency_code": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "value": {
+              "type": [
+                "null",
+                "number"
+              ]
+            }
+          }
         },
         "transaction_id": {
           "type": [
@@ -45,6 +150,24 @@
           ],
           "format": "date-time"
         },
+        "transaction_note": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "transaction_status": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "transaction_subject": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
         "transaction_amount": {
           "type": [
             "null",
@@ -61,7 +184,7 @@
             "value": {
               "type": [
                 "null",
-                "double"
+                "number"
               ]
             }
           }
@@ -82,7 +205,7 @@
             "value": {
               "type": [
                 "null",
-                "double"
+                "number"
               ]
             }
           }
@@ -103,7 +226,7 @@
             "value": {
               "type": [
                 "null",
-                "double"
+                "number"
               ]
             }
           }
@@ -124,7 +247,7 @@
             "value": {
               "type": [
                 "null",
-                "double"
+                "number"
               ]
             }
           }
@@ -145,7 +268,7 @@
             "value": {
               "type": [
                 "null",
-                "double"
+                "number"
               ]
             }
           }
@@ -188,7 +311,7 @@
         ]
       }
     },
-    "player_info": {
+    "payer_info": {
       "type": [
         "null",
         "object"
@@ -200,6 +323,51 @@
             "null",
             "string"
           ]
+        },
+        "address": {
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "line1": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "line2": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "city": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "country_code": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "postal_code": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "state": {
+              "type": [
+                "null",
+                "string"
+              ]
+            }
+          }
         },
         "email_address": {
           "type": [
@@ -235,13 +403,19 @@
             "surname": {
               "type": [
                 "null",
-                "float"
+                "string"
+              ]
+            },
+            "middle_name": {
+              "type": [
+                "null",
+                "string"
               ]
             },
             "alternate_full_name": {
               "type": [
                 "null",
-                "float"
+                "string"
               ]
             }
           }
@@ -303,17 +477,35 @@
                 "null",
                 "string"
               ]
+            },
+            "state": {
+              "type": [
+                "null",
+                "string"
+              ]
             }
           }
         }
       }
     },
     "cart_info": {
-      "anyOf": [
-        {
-          "type": "array",
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "item_details": {
+          "type": [
+            "null",
+            "array"
+          ],
+          "additionalProperties": false,
           "items": {
-            "type": "object",
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": false,
             "properties": {
               "item_code": {
@@ -337,7 +529,7 @@
               "item_quantity": {
                 "type": [
                   "null",
-                  "integer"
+                  "number"
                 ]
               },
               "item_unit_price": {
@@ -356,46 +548,12 @@
                   "value": {
                     "type": [
                       "null",
-                      "double"
+                      "number"
                     ]
                   }
                 }
               },
               "item_amount": {
-                "anyOf": [
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "properties": {
-                        "tax_amount": {
-                          "type": [
-                            "null",
-                            "object"
-                          ],
-                          "additionalProperties": false,
-                          "properties": {
-                            "currency_code": {
-                              "type": [
-                                "null",
-                                "string"
-                              ]
-                            },
-                            "value": {
-                              "type": [
-                                "null",
-                                "double"
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                ]
-              },
-              "tax_amounts": {
                 "type": [
                   "null",
                   "object"
@@ -411,9 +569,47 @@
                   "value": {
                     "type": [
                       "null",
-                      "double"
+                      "number"
                     ]
                   }
+                }
+              },
+              "tax_amounts": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "additionalProperties": false,
+                "items": {
+                  "type": [
+                    "null",
+                    "object"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "tax_amount": {
+                      "type": [
+                        "null",
+                        "object"
+                      ],
+                      "properties":
+                      {
+                        "currency_code": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "value": {
+                          "type": [
+                            "null",
+                            "number"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                    
                 }
               },
               "total_item_amount": {
@@ -432,10 +628,16 @@
                   "value": {
                     "type": [
                       "null",
-                      "double"
+                      "number"
                     ]
                   }
                 }
+              },
+              "tax_percentage": {
+                "type": [
+                  "null",
+                  "number"
+                ]
               },
               "invoice_number": {
                 "type": [
@@ -445,11 +647,29 @@
               }
             }
           }
-        },
-        {
-          "type": "null"
         }
-      ]
+      }
+    },
+    "store_info": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false
+    },
+    "auction_info": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false
+    },
+    "incentive_info": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false
     },
     "account_number": {
       "type": [
