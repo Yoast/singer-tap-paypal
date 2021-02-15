@@ -6,6 +6,9 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "transaction_id": {
+      "type": "string"
+    },
     "transaction_info": {
       "type": [
         "null",
@@ -702,6 +705,18 @@
               }
             }
           }
+        },
+        "paypal_invoice_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "tax_inclusive": {
+          "type": [
+            "null",
+            "boolean"
+          ]
         }
       }
     },

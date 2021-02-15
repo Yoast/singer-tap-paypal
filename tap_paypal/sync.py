@@ -1,14 +1,20 @@
 """Sync data."""
 # -*- coding: utf-8 -*-
+from datetime import datetime, timezone
 
 import logging
-from functools import reduce
 from typing import Callable, Optional
 
 import singer
 from singer.catalog import Catalog
 
 from tap_paypal.paypal import PayPal
+from tap_paypal.streams import STREAMS
+from tap_paypal.utils import (
+    clear_currently_syncing,
+    retrieve_bookmark_with_path,
+    get_stream_state,
+)
 
 LOGGER: logging.RootLogger = singer.get_logger()
 
@@ -68,53 +74,23 @@ def sync(
             )
 
             # Write a row to the stream
-            singer.write_records(stream.tap_stream_id, [row])
+            singer.write_record(
+                stream.tap_stream_id,
+                row,
+                time_extracted=datetime.now(timezone.utc),
+            )
 
             if bookmark:
                 # Save the bookmark to the state
-                singer.write_state(
-                    {stream.tap_stream_id: bookmark},
+                singer.write_bookmark(
+                    state,
+                    stream.tap_stream_id,
+                    STREAMS[stream.tap_stream_id]['bookmark'],
+                    bookmark,
                 )
 
+                # Clear currently syncing
+                clear_currently_syncing(state)
 
-def retrieve_bookmark_with_path(path: str, row: dict) -> Optional[str]:
-    """The bookmark exists in the row of data which is an dictionary. However,
-    the bookmark can either be a key such as row[key] but also a subkey such as
-    row[key][subkey]. In the streams definition file, the key can be saved as
-    a string, but [key][subkey] cannot. Therefore, in the streams file, if we
-    want to use a subkey as bookmark, we save it in the format 'key.subkey',
-    which is our path in the dictionary.
-    This helper function parses the string and checks whether it has a dot.
-    If it has one, it returns the value of the subkey in the row of data, e.g.
-    row[key][subkey]. If not it returns the alue of the key, e.g row[path].
-
-    Arguments:
-        path {str} -- Path in the dictionary
-        row {dict} -- Data row
-
-    Returns:
-        Optional[str] -- The value or from the key or subkey
-    """
-    # If the path has a dot, then parse it as key and subkeys
-    if '.' in path:
-        return str(reduce(dict.get, path.split('.'), row))  # type: ignore
-    # Else if the path is just a key, parse it as a normal key
-    elif path:
-        return row[path]
-    return None
-
-
-def get_stream_state(state: dict, tap_stream_id: str) -> dict:
-    """Return the state of the stream.
-
-    Arguments:
-        state {dict} -- The state
-        tap_stream_id {str} -- The id of the stream
-
-    Returns:
-        dict -- The state of the stream
-    """
-    return state.get(
-            'bookmarks',
-            {},
-        ).get(tap_stream_id)
+                # Write the bootmark
+                singer.write_state(state)
