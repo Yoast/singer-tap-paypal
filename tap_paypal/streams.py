@@ -6,5 +6,6 @@ STREAMS: dict = {
         'key_properties': ['transaction_info', 'transaction_id'],
         'replication_method': 'INCREMENTAL',
         'replication_key': 'transaction_info.transaction_updated_date',
+        'bookmark': 'start_date',
     }
 }

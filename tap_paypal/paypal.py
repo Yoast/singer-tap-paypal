@@ -4,6 +4,7 @@
 from datetime import datetime, timedelta, timezone
 from types import MappingProxyType
 from typing import Generator, Optional
+from tap_paypal.cleaners import clean_paypal_transactions
 
 import dateutil.parser
 import dateutil.rrule
@@ -205,7 +206,7 @@ class PayPal(object):
                     [],
                 )
                 for transaction in transactions:
-                    yield transaction
+                    yield clean_paypal_transactions(transaction)
 
         self.logger.info('Finished: paypal_transactions')
 
