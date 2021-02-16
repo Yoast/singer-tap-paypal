@@ -136,4 +136,9 @@ def clean_paypal_transactions(row: dict) -> dict:
             incentive['incentive_amount']['value'] = float(
                 incentive['incentive_amount']['value']
             )
+
+    # These keys can be added to the schema, however it is currently
+    # unknown which fields are available from the API.
+    row.pop('store_info', None)
+    row.pop('auction_info', None)
     return row
