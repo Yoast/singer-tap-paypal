@@ -57,7 +57,9 @@ class PayPal(object):
         post_data: dict = {'grant_type': 'client_credentials'}
 
         now: datetime = datetime.utcnow()
-        response: httpx._models.Response = httpx.post(  # noqa: WPS437
+
+        client: httpx.Client = httpx.Client(http2=True)
+        response: httpx._models.Response = client.post(  # noqa: WPS437
             url,
             headers=headers,
             data=post_data,
@@ -175,11 +177,13 @@ class PayPal(object):
                 params['page'] = page
 
                 # Request data from the API
-                response: httpx._models.Response = httpx.get(  # noqa: WPS437
+                client: httpx.Client = httpx.Client(http2=True)
+                response: httpx._models.Response = client.get(  # noqa: WPS437
                     url,
                     headers=self.headers,
                     params=params,
                 )
+
                 # Raise error on 4xx and 5xxx
                 response.raise_for_status()
 
