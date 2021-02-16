@@ -160,7 +160,9 @@ class PayPal(object):
                 'end_date': end_date_str,
             }
             # Kwargs can be used to add aditional parameters to each requests
-            params: dict = fixed_params | kwargs
+            params: dict = {**fixed_params, **kwargs}
+            # Python 3.9.0, change to this in the future:
+            # params: dict = fixed_params | kwargs
 
             # Start of pagination
             page: int = 0
