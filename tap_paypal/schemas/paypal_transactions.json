@@ -526,10 +526,7 @@
           ],
           "additionalProperties": false,
           "items": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": "object",
             "additionalProperties": false,
             "properties": {
               "checkout_options": {
@@ -539,10 +536,7 @@
                 ],
                 "additionalProperties": false,
                 "items": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": "object",
                   "additionalProperties": false,
                   "properties": {
                     "checkout_option_name": {
@@ -639,10 +633,7 @@
                 ],
                 "additionalProperties": false,
                 "items": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
+                  "type": "object",
                   "additionalProperties": false,
                   "properties": {
                     "tax_amount": {
@@ -720,20 +711,6 @@
         }
       }
     },
-    "store_info": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "additionalProperties": false
-    },
-    "auction_info": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "additionalProperties": false
-    },
     "incentive_info": {
       "type": [
         "null",
@@ -748,10 +725,7 @@
           ],
           "additionalProperties": false,
           "items": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": "object",
             "additionalProperties": false,
             "properties": {
               "incentive_amount": {
