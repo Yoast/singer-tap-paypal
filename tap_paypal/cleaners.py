@@ -1,4 +1,5 @@
 """Cleaner functions."""
+from dateutil.parser import parse
 
 
 def clean_paypal_transactions(row: dict) -> dict:
@@ -74,6 +75,20 @@ def clean_paypal_transactions(row: dict) -> dict:
                 row['transaction_info']['shipping_discount_amount']['value']
             )
         )
+    # transaction_info.transaction_initiation_date
+    if row.get('transaction_info', {}).get(
+        'transaction_initiation_date'
+    ):
+        row['transaction_info']['transaction_initiation_date'] = parse(
+            row['transaction_info']['transaction_initiation_date']
+        ).isoformat()
+    # transaction_info.transaction_updated_date
+    if row.get('transaction_info', {}).get(
+            'transaction_updated_date'
+    ):
+        row['transaction_info']['transaction_updated_date'] = parse(
+            row['transaction_info']['transaction_updated_date']
+        ).isoformat()
 
     # cart_info.item_unit_price.value
     if row.get('cart_info', {}).get('item_unit_price', {}).get(
@@ -136,6 +151,12 @@ def clean_paypal_transactions(row: dict) -> dict:
             incentive['incentive_amount']['value'] = float(
                 incentive['incentive_amount']['value']
             )
+
+    # last_refreshed_datetime
+    if row.get('last_refreshed_datetime'):
+        row['last_refreshed_datetime'] = parse(
+            row['last_refreshed_datetime']
+        ).isoformat()
 
     # These keys can be added to the schema, however it is currently
     # unknown which fields are available from the API.
