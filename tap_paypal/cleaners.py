@@ -1,4 +1,5 @@
 """Cleaner functions."""
+# -*- coding: utf-8 -*-
 from dateutil.parser import parse
 
 
