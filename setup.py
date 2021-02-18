@@ -7,7 +7,7 @@ setup(
     version='0.1.0',
     description='Singer.io tap for extracting data from PayPal',
     author='Yoast',
-    url='https://yoast.com',
+    url='https://github.com/Yoast/singer-tap-paypal',
     classifiers=['Programming Language :: Python :: 3 :: Only'],
     py_modules=['tap_paypal'],
     install_requires=[
