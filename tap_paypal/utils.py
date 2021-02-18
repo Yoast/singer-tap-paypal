@@ -1,4 +1,5 @@
 """Utilities."""
+# -*- coding: utf-8 -*-
 from typing import Optional
 from functools import reduce
 
