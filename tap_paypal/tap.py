@@ -3,15 +3,16 @@
 import logging
 from argparse import Namespace
 
-import singer
-from singer import utils
+import pkg_resources
+from singer import get_logger, utils
 from singer.catalog import Catalog
 
 from tap_paypal.discover import discover
 from tap_paypal.paypal import PayPal
 from tap_paypal.sync import sync
 
-LOGGER: logging.RootLogger = singer.get_logger()
+VERSION: str = pkg_resources.get_distribution('tap-paypal').version
+LOGGER: logging.RootLogger = get_logger()
 REQUIRED_CONFIG_KEYS: tuple = ('start_date', 'client_id', 'secret')
 
 
@@ -20,6 +21,8 @@ def main() -> None:
     """Run tap."""
     # Parse command line arguments
     args: Namespace = utils.parse_args(REQUIRED_CONFIG_KEYS)
+
+    LOGGER.info(f'>>> Running target-bigquery v{VERSION}')
 
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:

@@ -19,15 +19,16 @@ def discover() -> Catalog:  # noqa: WPS210
     # Parse every schema
     for stream_id, schema in raw_schemas.items():
 
+        stream_meta: dict = STREAMS[stream_id]
         # Create metadata
         mdata: list = metadata.get_standard_metadata(
             schema=schema.to_dict(),
-            key_properties=STREAMS[stream_id].get('key_properties', None),
-            valid_replication_keys=STREAMS[stream_id].get(
+            key_properties=stream_meta.get('key_properties', None),
+            valid_replication_keys=stream_meta.get(
                 'replication_keys',
                 None,
             ),
-            replication_method=STREAMS[stream_id].get(
+            replication_method=stream_meta.get(
                 'replication_method',
                 None,
             ),
@@ -39,13 +40,13 @@ def discover() -> Catalog:  # noqa: WPS210
                 tap_stream_id=stream_id,
                 stream=stream_id,
                 schema=schema,
-                key_properties=STREAMS[stream_id].get('key_properties', None),
+                key_properties=stream_meta.get('key_properties', None),
                 metadata=mdata,
-                replication_key=STREAMS[stream_id].get(
+                replication_key=stream_meta.get(
                     'replication_key',
                     None,
                 ),
-                replication_method=STREAMS[stream_id].get(
+                replication_method=stream_meta.get(
                     'replication_method',
                     None,
                 ),

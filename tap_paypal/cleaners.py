@@ -1,9 +1,11 @@
 """Cleaner functions."""
 # -*- coding: utf-8 -*-
-from dateutil.parser import parse
+from decimal import Decimal
+
+from dateutil.parser import parse as parse_d
 
 
-def clean_paypal_transactions(row: dict) -> dict:
+def clean_paypal_transactions(row: dict) -> dict:  # noqa: WPS 210,WPS231
     """Parse a row of transaction data and clean it.
 
     Arguments:
@@ -17,146 +19,127 @@ def clean_paypal_transactions(row: dict) -> dict:
         'transaction_id',
     )
 
-    # transaction_info.available_balance.value
-    if row.get('transaction_info', {}).get('available_balance', {}).get(
-        'value',
-    ):
-        row['transaction_info']['available_balance']['value'] = (
-            float(row['transaction_info']['available_balance']['value'])
-        )
-    # transaction_info.ending_balance.value
-    if row.get('transaction_info', {}).get('ending_balance', {}).get(
-        'value',
-    ):
-        row['transaction_info']['ending_balance']['value'] = (
-            float(row['transaction_info']['ending_balance']['value'])
-        )
-    # transaction_info.transaction_amount.value
-    if row.get('transaction_info', {}).get('transaction_amount', {}).get(
-        'value',
-    ):
-        row['transaction_info']['transaction_amount']['value'] = (
-            float(row['transaction_info']['transaction_amount']['value'])
-        )
-    # transaction_info.fee_amount.value
-    if row.get('transaction_info', {}).get('fee_amount', {}).get(
-        'value',
-    ):
-        row['transaction_info']['fee_amount']['value'] = (
-            float(row['transaction_info']['fee_amount']['value'])
-        )
-    # transaction_info.insurance_amount.value
-    if row.get('transaction_info', {}).get('insurance_amount', {}).get(
-        'value',
-    ):
-        row['transaction_info']['insurance_amount']['value'] = (
-            float(row['transaction_info']['insurance_amount']['value'])
-        )
-    # transaction_info.shipping_amount.value
-    if row.get('transaction_info', {}).get('shipping_amount', {}).get(
-        'value',
-    ):
-        row['transaction_info']['shipping_amount']['value'] = (
-            float(row['transaction_info']['shipping_amount']['value'])
-        )
-    # transaction_info.sales_tax_amount.value
-    if row.get('transaction_info', {}).get('sales_tax_amount', {}).get(
-        'value',
-    ):
-        row['transaction_info']['sales_tax_amount']['value'] = (
-            float(row['transaction_info']['sales_tax_amount']['value'])
-        )
-    # transaction_info.shipping_discount_amount.value
-    if row.get('transaction_info', {}).get(
-        'shipping_discount_amount', {}).get(
-        'value',
-    ):
-        row['transaction_info']['shipping_discount_amount']['value'] = (
-            float(
-                row['transaction_info']['shipping_discount_amount']['value']
-            )
-        )
-    # transaction_info.transaction_initiation_date
-    if row.get('transaction_info', {}).get(
-        'transaction_initiation_date'
-    ):
-        row['transaction_info']['transaction_initiation_date'] = parse(
-            row['transaction_info']['transaction_initiation_date']
-        ).isoformat()
-    # transaction_info.transaction_updated_date
-    if row.get('transaction_info', {}).get(
-            'transaction_updated_date'
-    ):
-        row['transaction_info']['transaction_updated_date'] = parse(
-            row['transaction_info']['transaction_updated_date']
-        ).isoformat()
+    # Transaction info
+    t_info: dict = row.get('transaction_info', {})
 
-    # cart_info.item_unit_price.value
-    if row.get('cart_info', {}).get('item_unit_price', {}).get(
-        'value',
-    ):
-        row['cart_info']['item_unit_price']['value'] = (
-            float(row['cart_info']['item_unit_price']['value'])
-        )
+    if t_info:
+        # transaction_info.available_balance.value
+        if t_info.get('available_balance', {}).get('value'):
+            t_info['available_balance']['value'] = Decimal(
+                t_info['available_balance']['value'],
+            )
 
-    # tax_cart_info.amounts.item_unit_price.value
-    if row.get('cart_info', {}).get('tax_amounts', {}).get(
-        'value',
-    ):
-        row['cart_info']['tax_amounts']['value'] = (
-            float(row['cart_info']['tax_amounts']['value'])
-        )
-    # cart_info.item_unit_price.value
-    if row.get('cart_info', {}).get('total_item_amount', {}).get(
-        'value',
-    ):
-        row['cart_info']['total_item_amount']['value'] = (
-            float(row['cart_info']['total_item_amount']['value'])
-        )
+        # transaction_info.ending_balance.value
+        if t_info.get('ending_balance', {}).get('value'):
+            t_info['ending_balance']['value'] = Decimal(
+                t_info['ending_balance']['value'],
+            )
 
-    for details in row.get('cart_info', {}).get('item_details', []):
-        # cart_info.item_details[item_quantity]
-        if details.get('item_quantity'):
-            details['item_quantity'] = float(details['item_quantity'])
-        # cart_info.item_details[item_unit_price.value]
-        if details.get('item_unit_price', {}).get('value'):
-            details['item_unit_price']['value'] = float(
-                details['item_unit_price']['value']
+        # transaction_info.transaction_amount.value
+        if t_info.get('transaction_amount', {}).get('value'):
+            t_info['transaction_amount']['value'] = Decimal(
+                t_info['transaction_amount']['value'],
             )
-        # cart_info.item_details[item_amount.value]
-        if details.get('item_amount', {}).get('value'):
-            details['item_amount']['value'] = float(
-                details['item_amount']['value']
+
+        # transaction_info.fee_amount.value
+        if t_info.get('fee_amount', {}).get('value'):
+            t_info['fee_amount']['value'] = Decimal(
+                t_info['fee_amount']['value'],
             )
-        # cart_info.item_details[total_item_amount.value]
-        if details.get('total_item_amount', {}).get('value'):
-            details['total_item_amount']['value'] = float(
-                details['total_item_amount']['value']
+
+        # transaction_info.insurance_amount.value
+        if t_info.get('insurance_amount', {}).get('value'):
+            t_info['insurance_amount']['value'] = Decimal(
+                t_info['insurance_amount']['value'],
             )
-        # cart_info.item_details[tax_amounts[tax_amount.value]]
-        for tax in details.get('tax_amounts', []):
+
+        # transaction_info.shipping_amount.value
+        if t_info.get('shipping_amount', {}).get('value'):
+            t_info['shipping_amount']['value'] = Decimal(
+                t_info['shipping_amount']['value'],
+            )
+
+        # transaction_info.sales_tax_amount.value
+        if t_info.get('sales_tax_amount', {}).get('value'):
+            t_info['sales_tax_amount']['value'] = Decimal(
+                t_info['sales_tax_amount']['value'],
+            )
+
+        # transaction_info.shipping_discount_amount.value
+        if t_info.get('shipping_discount_amount', {}).get('value'):
+            t_info['shipping_discount_amount']['value'] = Decimal(
+                t_info['shipping_discount_amount']['value'],
+            )
+
+        # transaction_info.transaction_initiation_date
+        if t_info.get('transaction_initiation_date'):
+            t_info['transaction_initiation_date'] = parse_d(
+                t_info['transaction_initiation_date'],
+            ).isoformat()
+
+        # transaction_info.transaction_updated_date
+        if t_info.get('transaction_updated_date'):
+            t_info['transaction_updated_date'] = parse_d(
+                t_info['transaction_updated_date'],
+            ).isoformat()
+
+    # Cart info
+    c_info: dict = row.get('cart_info', {})
+    cart_all: list = c_info.get('item_details', [])
+
+    for cart in cart_all:
+        # cart_info.item_details.item_unit_price.value
+        if cart.get('item_unit_price', {}).get('value'):
+            cart['item_unit_price']['value'] = Decimal(
+                cart['item_unit_price']['value'],
+            )
+
+        # cart_info.item_details.tax_amounts
+        tax_amounts: list = cart.get('tax_amounts', [])
+
+        for tax in tax_amounts:
+            #  cart_info.item_details.tax_amounts.tax_amount.value
             if tax.get('tax_amount', {}).get('value'):
-                tax['tax_amount']['value'] = float(
-                    tax['tax_amount']['value']
+                tax['tax_amount']['value'] = Decimal(
+                    tax['tax_amount']['value'],
                 )
-        # cart_info.item_details[tax_percentage]
-        if details.get('tax_percentage'):
-            details['tax_percentage'] = float(details['tax_percentage'])
 
-    for incentive in row.get('incentive_info', {}).get(
-        'incentive_details',
-        [],
-    ):
-        # incentive_details.incentive_amount.value
-        if incentive.get('incentive_amount', {}).get('value'):
-            incentive['incentive_amount']['value'] = float(
-                incentive['incentive_amount']['value']
+        # cart_info.item_details.item_amount.value
+        if cart.get('item_amount', {}).get('value'):
+            cart['item_amount']['value'] = Decimal(
+                cart['item_amount']['value'],
+            )
+
+        # cart_info.item_details.total_item_amount.value
+        if cart.get('total_item_amount', {}).get('value'):
+            cart['total_item_amount']['value'] = Decimal(
+                cart['total_item_amount']['value'],
+            )
+
+        # cart_info.item_details.tax_percentage
+        if cart.get('tax_percentage'):
+            cart['tax_percentage'] = Decimal(cart['tax_percentage'])
+
+        # cart_info.item_details.item_quantity
+        if cart.get('item_quantity'):
+            cart['item_quantity'] = Decimal(cart['item_quantity'])
+
+    # Incentive info
+    i_info: dict = row.get('incentive_info', {})
+    i_all: list = i_info.get('incentive_details', [])
+
+    for inc in i_all:
+
+        # incentive_info.incentive_details.incentive_amount.value
+        if inc.get('incentive_amount', {}).get('value'):
+            inc['incentive_amount']['value'] = Decimal(
+                inc['incentive_amount']['value'],
             )
 
     # last_refreshed_datetime
     if row.get('last_refreshed_datetime'):
-        row['last_refreshed_datetime'] = parse(
-            row['last_refreshed_datetime']
+        row['last_refreshed_datetime'] = parse_d(
+            row['last_refreshed_datetime'],
         ).isoformat()
 
     # These keys can be added to the schema, however it is currently

@@ -1,14 +1,14 @@
-"""Utilities."""
+"""Tools."""
 # -*- coding: utf-8 -*-
-from typing import Optional
 from functools import reduce
+from typing import Optional
 
 
 def clear_currently_syncing(state: dict) -> dict:
     """Clear the currently syncing from the state.
 
     Arguments:
-        state {dict} -- State file
+        state (dict) -- State file
 
     Returns:
         dict -- New state file
@@ -27,14 +27,15 @@ def get_stream_state(state: dict, tap_stream_id: str) -> dict:
         dict -- The state of the stream
     """
     return state.get(
-            'bookmarks',
-            {},
-        ).get(tap_stream_id)
+        'bookmarks',
+        {},
+    ).get(tap_stream_id)
 
 
 def retrieve_bookmark_with_path(path: str, row: dict) -> Optional[str]:
-    """The bookmark exists in the row of data which is an dictionary. However,
-    the bookmark can either be a key such as row[key] but also a subkey such as
+    """Bookmark exists in the row of data which is an dictionary.
+
+    The bookmark can either be a key such as row[key] but also a subkey such as
     row[key][subkey]. In the streams definition file, the key can be saved as
     a string, but [key][subkey] cannot. Therefore, in the streams file, if we
     want to use a subkey as bookmark, we save it in the format 'key.subkey',

@@ -1,6 +1,6 @@
 """Setup."""
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name='tap-paypal',
@@ -15,15 +15,15 @@ setup(
         'python-dateutil~=2.8.1',
         'singer-python~=5.10.0',
     ],
-    entry_points='''
+    entry_points="""
         [console_scripts]
         tap-paypal=tap_paypal:main
-    ''',
+    """,
     packages=find_packages(),
     package_data={
         'tap_paypal': [
-            'schemas/*.json'
-        ]
+            'schemas/*.json',
+        ],
     },
     include_package_data=True,
 )
