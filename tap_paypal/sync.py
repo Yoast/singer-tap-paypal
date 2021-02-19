@@ -1,20 +1,15 @@
 """Sync data."""
 # -*- coding: utf-8 -*-
-from datetime import datetime, timezone
-
 import logging
+from datetime import datetime, timezone
 from typing import Callable, Optional
 
 import singer
-from singer.catalog import Catalog
+from singer.catalog import Catalog, CatalogEntry
 
+from tap_paypal import tools
 from tap_paypal.paypal import PayPal
 from tap_paypal.streams import STREAMS
-from tap_paypal.utils import (
-    clear_currently_syncing,
-    retrieve_bookmark_with_path,
-    get_stream_state,
-)
 
 LOGGER: logging.RootLogger = singer.get_logger()
 
@@ -47,7 +42,10 @@ def sync(
         singer.set_currently_syncing(state, stream.tap_stream_id)
 
         # Retrieve the state of the stream
-        stream_state: dict = get_stream_state(state, stream.tap_stream_id)
+        stream_state: dict = tools.get_stream_state(
+            state,
+            stream.tap_stream_id,
+        )
 
         LOGGER.debug(f'Stream state: {stream_state}')
 
@@ -67,30 +65,41 @@ def sync(
         # E.g. if the state of the stream has a key 'start_date', it will be
         # used in the method as start_date='2021-01-01T00:00:00+0000'
         for row in tap_data(**stream_state):
-            # Retrieve the value of the bootmark
-            bookmark: Optional[str] = retrieve_bookmark_with_path(
-                stream.replication_key,
-                row,
-            )
+            sync_record(stream, row, state)
 
-            # Write a row to the stream
-            singer.write_record(
-                stream.tap_stream_id,
-                row,
-                time_extracted=datetime.now(timezone.utc),
-            )
 
-            if bookmark:
-                # Save the bookmark to the state
-                singer.write_bookmark(
-                    state,
-                    stream.tap_stream_id,
-                    STREAMS[stream.tap_stream_id]['bookmark'],
-                    bookmark,
-                )
+def sync_record(stream: CatalogEntry, row: dict, state: dict) -> None:
+    """Sync the record.
 
-                # Clear currently syncing
-                clear_currently_syncing(state)
+    Arguments:
+        stream {CatalogEntry} -- Stream catalog
+        row {dict} -- Record
+        state {dict} -- State
+    """
+    # Retrieve the value of the bookmark
+    bookmark: Optional[str] = tools.retrieve_bookmark_with_path(
+        stream.replication_key,
+        row,
+    )
 
-                # Write the bootmark
-                singer.write_state(state)
+    # Write a row to the stream
+    singer.write_record(
+        stream.tap_stream_id,
+        row,
+        time_extracted=datetime.now(timezone.utc),
+    )
+
+    if bookmark:
+        # Save the bookmark to the state
+        singer.write_bookmark(
+            state,
+            stream.tap_stream_id,
+            STREAMS[stream.tap_stream_id]['bookmark'],
+            bookmark,
+        )
+
+        # Clear currently syncing
+        tools.clear_currently_syncing(state)
+
+        # Write the bootmark
+        singer.write_state(state)
