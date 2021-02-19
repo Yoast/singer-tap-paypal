@@ -1,6 +1,7 @@
 """PayPal API Client."""  # noqa: WPS226
 # -*- coding: utf-8 -*-
 
+import logging
 from datetime import datetime, timedelta, timezone
 from types import MappingProxyType
 from typing import Generator, Optional
@@ -15,6 +16,7 @@ from tap_paypal.cleaners import clean_paypal_transactions
 # Todo: Sadbox
 API_SCHEME: str = 'https://'
 API_BASE_URL: str = 'api-m.paypal.com'
+API_BASE_URL_SANDBOX: str = 'api-m.sandbox.paypal.com'
 API_VERSION: str = 'v1'
 
 API_PATH_OAUTH: str = 'oauth2/token'
@@ -26,22 +28,35 @@ HEADERS: MappingProxyType = MappingProxyType({  # Frozen dictionary
 })
 
 
-class PayPal(object):
+class PayPal(object):  # noqa: WPS230
     """PayPal API Client."""
 
-    def __init__(self, client_id: str, secret: str) -> None:
+    def __init__(
+        self,
+        client_id: str,
+        secret: str,
+        sandbox=False,
+    ) -> None:
         """Initialize client.
 
         Arguments:
             client_id {str} -- PayPal client id
             secret {str} -- PayPal secret
+            sandbox {bool} -- Whether to use the sandbox or live environment
         """
         self.client_id: str = client_id
         self.secret: str = secret
-        self.logger = singer.get_logger()
+        self.sandbox: bool = sandbox
+        self.base: str = API_BASE_URL_SANDBOX if sandbox else API_BASE_URL
+        self.logger: logging.Logger = singer.get_logger()
 
         self.token: Optional[str] = None
         self.token_expires: Optional[datetime] = None
+
+        if sandbox:
+            self.logger.info('Running in Sandbox environment')
+        else:
+            self.logger.info('Running in Live environment')
 
         # Perform authentication during initialising
         self._authenticate()
@@ -128,7 +143,7 @@ class PayPal(object):
             page: int = 0
             total_pages: int = 1
             url: str = (
-                f'{API_SCHEME}{API_BASE_URL}/'
+                f'{API_SCHEME}{self.base}/'
                 f'{API_VERSION}/{API_PATH_TRANSACTIONS}'
             )
 
@@ -186,7 +201,7 @@ class PayPal(object):
     def _authenticate(self) -> None:  # noqa: WPS210
         """Generate a bearer access token."""
         url: str = (
-            f'{API_SCHEME}{API_BASE_URL}/'
+            f'{API_SCHEME}{self.base}/'
             f'{API_VERSION}/{API_PATH_OAUTH}'
         )
         headers: dict = {

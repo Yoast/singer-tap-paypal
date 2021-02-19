@@ -22,7 +22,7 @@ def main() -> None:
     # Parse command line arguments
     args: Namespace = utils.parse_args(REQUIRED_CONFIG_KEYS)
 
-    LOGGER.info(f'>>> Running target-bigquery v{VERSION}')
+    LOGGER.info(f'>>> Running tap-paypal v{VERSION}')
 
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
@@ -42,6 +42,7 @@ def main() -> None:
     paypal: PayPal = PayPal(
         args.config['client_id'],
         args.config['secret'],
+        args.config.get('sandbox', False),
     )
 
     sync(paypal, args.state, catalog, args.config['start_date'])

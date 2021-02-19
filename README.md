@@ -16,12 +16,12 @@ This tap:
 
 1. [Log in to the Developer Dashboard](https://www.paypal.com/signin?returnUri=https%3A%2F%2Fdeveloper.paypal.com%2Fdeveloper%2Fapplications) with your PayPal account.
 2. Under the DASHBOARD menu, select My Apps & Credentials.
-3. Make sure you're on the Live tab to get the Live API credentials.
+3. Make sure you're on the Live tab if you want to use the Live environment, to get the Live API credentials.
 4. Under the App Name column, select Default Application, which PayPal creates with a new Developer Dashboard account. Select Create App if you don't see the default app.
 
 ### Step 2: Configure
 
-Create a file called `paypal_config.json` in your working directory, following [config.json.example](config.json.example). The required parameters are the `client_id` and `secret`.
+Create a file called `paypal_config.json` in your working directory, following [config.json.example](config.json.example). The required parameters are the `client_id` and `secret`. The sandbox parameter determines whether to use the sandbox or live environment.
 
 This requires a `state.json` file to let the tap know from when to retrieve data. For example:
 ```
