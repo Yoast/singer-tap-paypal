@@ -219,6 +219,12 @@
             "string"
           ]
         },
+        "instrument_sub_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
         "insurance_amount": {
           "type": [
             "null",
