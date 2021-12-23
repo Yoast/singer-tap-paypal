@@ -213,12 +213,6 @@
             }
           }
         },
-        "instrument_type": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
         "instrument_sub_type": {
           "type": [
             "null",
