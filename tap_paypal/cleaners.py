@@ -47,6 +47,14 @@ def clean_paypal_transactions(row: dict) -> dict:  # noqa: WPS 210,WPS231
                 t_info['fee_amount']['value'],
             )
 
+        # transaction_info.instrument_type
+        if not t_info.get('instrument_type'):
+            t_info['instrument_type'] = None
+
+        # transaction_info.instrument_sub_type
+        if not t_info.get('instrument_sub_type'):
+            t_info['instrument_sub_type'] = None
+
         # transaction_info.insurance_amount.value
         if t_info.get('insurance_amount', {}).get('value'):
             t_info['insurance_amount']['value'] = Decimal(
