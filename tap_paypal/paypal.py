@@ -168,7 +168,7 @@ class PayPal(object):  # noqa: WPS230
 
                 # Retrieve the current page details
                 page = response_data.get('page', 1)
-                total_pages = response_data.get('total_pages', 0)
+                total_pages = response_data.get('total_pages', 1)
 
                 percentage_page: float = round((page / total_pages) * 100, 2)
                 percentage_batch: float = round(
